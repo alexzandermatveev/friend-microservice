@@ -1,0 +1,64 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: friends-microservice
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://postgres-docker-container:5432/friend_db}
+    username: ${SPRING_DATASOURCE_USERNAME:postgres}
+    password: ${SPRING_DATASOURCE_PASSWORD:1gjAVnJ}
+    driver-class-name: org.postgresql.Driver
+
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.xml
+    contexts: postgres
+    enabled: true
+  main:
+    web-application-type: servlet
+
+  jpa:
+    hibernate:
+      ddl-auto: none
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: false
+
+#  logging:
+#    level:
+#      org.springframework.boot.context.properties: DEBUG
+
+
+  cloud:
+    discovery:
+      enabled: true
+    config:
+      enable: false
+    service-registry:
+      auto-registration:
+        enable: true
+
+
+eventkafka:
+  bootstrapServers: ${EVENTKAFKA_BOOTSTRAP-SERVERS:kafka-confluentinc-container:9092}
+  topicName: events
+  groupId: test-group
+
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_CLIENT_SERVICE-URL:http://gateway-eureka-microservice:8761/eureka/}   # URL Eureka Server
+  instance:
+    instanceId: ${spring.cloud.client.ip-address}:${server.port}
+    prefer-ip-address: true # регистрируем микросервис по ip
+
+serviceAuth:
+  service-name: ${SERVICEAUTH_SERVICE-NAME:auth-microservice}
+  pathTo: ${SERVICEAUTH_PATHTO:/api/v1/auth/validate?token=}
+
+logging:
+  level:
+    root: WARN
+
